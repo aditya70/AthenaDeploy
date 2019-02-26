@@ -1,8 +1,8 @@
 {
-  "name": "Web Speech AI Chatbot Demo",
-  "description": "Simple AI Chat Bot Demo with Web Speech API",
-  "repository": "https://github.com/girliemac/web-speech-ai",
-  "keywords": ["ai", "api.ai", "bot", "w3c"],
+  "name": "Athena",
+  "description": "Athena chatbot",
+  "repository": "",
+  "keywords": ["ai", "api.ai", "bot", ""],
   "env": {
     "APIAI_TOKEN": {
       "description": "API.ai Client access token",
