@@ -7,6 +7,7 @@ var chatHistoryController = require('./chatHistoryController');
 var botResponseController = require('./botResponseController');
 var conversationHistoryController = require('./conversationHistoryController');
 var conversationController = require('./conversationController');
+var sendChatToEmailController = require('./sendChatToEmailController')
 
 // Add headers
 app.use(bodyParser.json());
@@ -54,5 +55,8 @@ router.route('/conversationhistory')
 
 router.route('/conversation')
 .get(conversationController.getBotResponse);
+
+router.route('/sendemail')
+.get(sendChatToEmailController.sendConversationHistoryToEmail);
 
 module.exports = router;
