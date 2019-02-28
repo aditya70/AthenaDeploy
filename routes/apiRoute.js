@@ -5,7 +5,8 @@ var bodyParser = require('body-parser');
 
 var chatHistoryController = require('./chatHistoryController');
 var botResponseController = require('./botResponseController');
-
+var conversationHistoryController = require('./conversationHistoryController');
+var conversationController = require('./conversationController');
 
 // Add headers
 app.use(bodyParser.json());
@@ -35,7 +36,7 @@ router.use(bodyParser.json());
 router.get('/' ,(req,res) =>{
  
     console.log('api route ');
-    res.send('api route');
+    res.send('welcome to api route');
     
 })
 
@@ -47,5 +48,11 @@ router.route('/getconversationhistory')
 router.route('/getbotresponse')
 .get(botResponseController.getBotResponse);
 
+router.route('/conversationhistory')
+.get(conversationHistoryController.getConversationHistory)
+.post(conversationHistoryController.postConversationHistory);
+
+router.route('/conversation')
+.get(conversationController.getBotResponse);
 
 module.exports = router;

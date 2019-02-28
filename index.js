@@ -48,10 +48,10 @@ app.use(logger('dev'))
 //   }
 // })
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+// con.connect(function(err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 const server = app.listen(app.get('port'), () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
