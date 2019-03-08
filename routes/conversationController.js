@@ -11,6 +11,8 @@ var router = express.Router();
 var sql = require('../config/msSqlUtil')
 const apiai = require('apiai')(APIAI_TOKEN);
 const mysql = require('mysql');
+const requestModule = require('request');
+var baseUrl = require('../config/baseUrl');
 //enables cors
 
   module.exports.getBotResponse = function(req , res){
@@ -20,18 +22,7 @@ const mysql = require('mysql');
     const userId = req.query.userId;
     const text = req.query.q;
 
-   // create Request object
-  //  var request = new sql.Request();
-           
-  //  // query to the database and get the records
-  //   request.query('select top(10) * from chat_history', function (err, recordset) {
  
-  //     if (err) console.log(err)
-  //    // send records as a response
-  //   res.send(recordset.recordset);
-    
-  //   });
-
   let apiaiReq = apiai.textRequest(text, {
     sessionId: APIAI_SESSION_ID
   });
@@ -108,7 +99,7 @@ const mysql = require('mysql');
   request.query(query, function (err, recordset) {
     if (err) {
                console.log("Error while querying database :- " + err);
-              return res.send(err);
+              return res.status(500).send(err);
               }
               else {
                // console.log( recordset.recordset);
@@ -129,8 +120,28 @@ const mysql = require('mysql');
                   if (err) throw err;
                    console.log("chat history record inserted");
                  });
+                 
+                 if(!aiText.includes("****"))
+                 {
+                  res.status(200).send(aiText);
+                 }
                   
-                 res.send(aiText);
+                 else
+                 {
+                  requestModule.post(baseUrl, { json: response.result},
+
+                function (error, responseDlModel, body) {
+                if (!error && responseDlModel.statusCode == 200) {
+                  console.log(body)
+                  res.status(200).send(body);
+              }
+              else{
+                res.status(500).send(JSON.stringify({"error": error, "response": null}))
+              }
+              
+          }
+      );
+                 }
                 }
         });
 
