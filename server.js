@@ -5,7 +5,7 @@ const logger = require('morgan');
 var sql = require('./config/msSqlUtil');
 const apiRoute = require('./routes/apiRoute')
 
-app.set('port',process.env.port || 8000);
+app.set('port',process.env.port || 3000);
 
 app.use(cookieParser());
 app.use(logger('dev'));
