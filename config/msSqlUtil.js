@@ -8,8 +8,8 @@ var sql = require("mssql");
 var config = {
     user: 'sa',
     password: 'shezar@123',
-    server: 'DESKTOP-PTAUQID', 
-    database: 'Athena' 
+    server: 'DESKTOP-PTAUQID',
+    database: 'Athena'
     // user: 'iic_aditya',
     // password: 'aditya@123',
     // server: "10.2.194.8\SQL2016", 
@@ -17,31 +17,31 @@ var config = {
 };
 
 
-    // connect to your database
-    // sql.connect(config, function (err) {
-    
-    //     if (err) console.log(err);
-    //     else{
-    //         console.log("connected to ms sql database");
-    //     }
-    // });
+// connect to your database
+// sql.connect(config, function (err) {
 
-    module.exports = sql;
+//     if (err) console.log(err);
+//     else{
+//         console.log("connected to ms sql database");
+//     }
+// });
+
+module.exports = sql;
 
 // app.get('/', function (req, res) {
-   
+
 //     // create Request object
 //      var request = new sql.Request();
-           
+
 //      // query to the database and get the records
 //       request.query('select top(10) * from PartType', function (err, recordset) {
-      
-         
+
+
 //          if (err) console.log(err)
 
 //          // send records as a response
 //          res.send(recordset);
-         
+
 //      });
 
 // });
