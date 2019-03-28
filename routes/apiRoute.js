@@ -42,14 +42,14 @@ router.get('/' ,(req,res) =>{
 })
 
 
-router.route('/conversationhistory')
+router.route('/getconversationhistory')
 .get(chatHistoryController.getConversationHistory)
 .post(chatHistoryController.postConversationHistory);
 
 router.route('/getbotresponse')
 .get(botResponseController.getBotResponse);
 
-router.route('/getconversationhistory')
+router.route('/conversationhistory')
 .get(conversationHistoryController.getConversationHistory)
 .post(conversationHistoryController.postConversationHistory);
 

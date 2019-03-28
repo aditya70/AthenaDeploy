@@ -32,7 +32,7 @@ module.exports.postConversationHistory = function (req, res) {
  
  const result = Joi.validate(req.body, schema);
  let pageIndex = 1;
- let itemsPerPage = 4;
+ let itemsPerPage = 10;
 
 if(req.body.pageIndex)
 {
@@ -44,8 +44,8 @@ if(req.body.itemsPerPage)
  itemsPerPage = req.body.itemsPerPage;
 }
 
-let limit = (pageIndex-1) * itemsPerPage;
-let offset = itemsPerPage;
+let offset = (pageIndex - 1) * itemsPerPage;
+let limit = itemsPerPage;
 
   if (result.error) {
     //console.log(result.error);

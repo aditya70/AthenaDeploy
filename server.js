@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-// var sql = require('./config/msSqlUtil');
-global.con = require('./config/mysqlUtil.js')
+var sql = require('./config/msSqlUtil');
+//global.con = require('./config/mysqlUtil.js')
 const apiRoute = require('./routes/apiRoute')
 
 app.set('port', process.env.port || 3000);

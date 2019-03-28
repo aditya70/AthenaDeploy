@@ -17,14 +17,15 @@ var config = {
 };
 
 
-// connect to your database
-// sql.connect(config, function (err) {
+//connect to your database
 
-//     if (err) console.log(err);
-//     else{
-//         console.log("connected to ms sql database");
-//     }
-// });
+sql.connect(config, function (err) {
+
+    if (err) console.log(err);
+    else{
+        console.log("connected to ms sql database");
+    }
+});
 
 module.exports = sql;
 

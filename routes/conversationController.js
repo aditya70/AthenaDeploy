@@ -258,18 +258,16 @@ module.exports.getBotResponse = function (req, res) {
     }
 
     else {
-      // console.log(`json to DL model is : ${json}`);
+    
       requestModule.post("http://13.232.168.178:8000/customapi", { json: json },
 
         function (error, responseDlModel, body) {
-          // console.log("body is"+body);
-          // console.log("responseDlModel is"+responseDlModel);
-
-          if (!error && responseDlModel.statusCode == 200) {
+         
+         if (!error && responseDlModel.statusCode == 200) {
 
             var concatedAiText = "";
             if (body.Text && body.Text == 1) {
-              //  console.log("ai text is ......." + aiText);
+           
               concatedAiText = aiText.replace("****", body.TextContent);
               return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": concatedAiText }));
             }
