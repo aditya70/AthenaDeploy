@@ -8,6 +8,7 @@ var botResponseController = require('./botResponseController');
 var conversationHistoryController = require('./conversationHistoryController');
 var conversationController = require('./conversationController');
 var sendChatToEmailController = require('./sendChatToEmailController')
+var ConversationControllerCopy = require('./conversationController - Copy');
 
 // Add headers
 app.use(bodyParser.json());

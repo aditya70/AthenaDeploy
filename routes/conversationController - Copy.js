@@ -148,12 +148,32 @@ module.exports.getBotResponse = function (req, res) {
   //   });
 
   apiaiReq.on('response', (response) => {
-    //console.log(response);
-    let paramteresJson = response.result.parameters;
-    console.log(paramteresJson);
 
-    let entity1 = "",
+    let paramteresJson = response.result.parameters;
+   // console.log("outside output context");
+    //console.log(paramteresJson);
+
+    let contextJson = response.result.contexts;
+    if (typeof contextJson !== 'undefined' && contextJson) {
+      let length = contextJson.length;
+
+        if (length > 0) {
+        if (typeof contextJson[length - 1].parameters !== 'undefined' && contextJson[length - 1].parameters) {
+           paramteresJson = contextJson[length - 1].parameters;
+          // console.log("inside output context");
+         //  console.log(paramteresJson);
+      
+          }
+      }
+
+    }
+
+  //  console.log("passed to dl model");
+   // console.log(paramteresJson);
+
+     let entity1 = "",
       entity2 = "",
+      entity3 = "",
       sector = "",
       businessUnit = "",
       division = "",
@@ -171,11 +191,17 @@ module.exports.getBotResponse = function (req, res) {
       endDate = "",
       listSort = "",
       groupBy = "",
+      tenureGroup = "",
+      month = "",
+      employeeGroup = "",
+      spanOfControl = "",
       date = "";
 
     if (typeof paramteresJson.Org_structure_KPI !== 'undefined') entity1 = paramteresJson.Org_structure_KPI;
     if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
     if (typeof paramteresJson.Org_structure_KPI1 !== 'undefined') entity2 = paramteresJson.Org_structure_KPI1;
+    if (typeof paramteresJson.Commonly_used_terms !== 'undefined') entity3 = paramteresJson.Commonly_used_terms;
+    if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
     if (typeof paramteresJson.Business_Unit !== 'undefined') businessUnit = paramteresJson.Business_Unit;
     if (typeof paramteresJson.Department !== 'undefined') department = paramteresJson.Department;
     if (typeof paramteresJson.Gender !== 'undefined') gender = paramteresJson.Gender;
@@ -200,6 +226,7 @@ module.exports.getBotResponse = function (req, res) {
       "question": text,
       "entity1": entity1,
       "entity2": entity2,
+      'entity3': entity3,
       "sector": sector,
       "businessUnit": businessUnit,
       "division": division,
@@ -216,7 +243,11 @@ module.exports.getBotResponse = function (req, res) {
       "startDate": "",
       "endDate": "",
       "listSort": "",
-      "groupBy": groupBy
+      "groupBy": groupBy,
+      "tenureGroup": tenureGroup,
+      "month": month,
+      "employeeGroup": employeeGroup,
+      "spanOfControl": spanOfControl
     };
 
     var aiText = response.result.fulfillment.speech;
@@ -227,14 +258,16 @@ module.exports.getBotResponse = function (req, res) {
     }
 
     else {
+    
       requestModule.post("http://13.232.168.178:8000/customapi", { json: json },
 
         function (error, responseDlModel, body) {
-          if (!error && responseDlModel.statusCode == 200) {
+         
+         if (!error && responseDlModel.statusCode == 200) {
 
             var concatedAiText = "";
             if (body.Text && body.Text == 1) {
-            //  console.log("ai text is ......." + aiText);
+           
               concatedAiText = aiText.replace("****", body.TextContent);
               return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": concatedAiText }));
             }
@@ -250,7 +283,6 @@ module.exports.getBotResponse = function (req, res) {
 
     }
   });
-
 
   apiaiReq.on('error', (error) => {
     console.log(error);

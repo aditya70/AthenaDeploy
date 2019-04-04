@@ -77,7 +77,7 @@ module.exports.postConversationHistory = function (req, res) {
 
          totalRecords = recordset.recordset[0][""];
 
-        var stringRequest = `select * from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' ORDER BY id
+        var stringRequest = `select user_query,bot_response,created_date from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' ORDER BY id
           OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY`;
        // console.log(stringRequest);
 

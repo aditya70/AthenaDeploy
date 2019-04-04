@@ -8,7 +8,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 var router = express.Router();
-//var sql = require('../config/msSqlUtil')
+var sql = require('../config/msSqlUtil')
 const apiai = require('apiai')(APIAI_TOKEN);
 const mysql = require('mysql');
 const requestModule = require('request');
@@ -150,28 +150,22 @@ module.exports.getBotResponse = function (req, res) {
   apiaiReq.on('response', (response) => {
 
     let paramteresJson = response.result.parameters;
-    console.log("outside output context");
-    console.log(paramteresJson);
 
     let contextJson = response.result.contexts;
     if (typeof contextJson !== 'undefined' && contextJson) {
       let length = contextJson.length;
 
-        if (length > 0) {
+      if (length > 0) {
         if (typeof contextJson[length - 1].parameters !== 'undefined' && contextJson[length - 1].parameters) {
-           paramteresJson = contextJson[length - 1].parameters;
-           console.log("inside output context");
-           console.log(paramteresJson);
-      
-          }
+          paramteresJson = contextJson[length - 1].parameters;
+        }
       }
 
     }
 
-    console.log("passed to dl model");
-    console.log(paramteresJson);
+    //console.log(paramteresJson);
 
-     let entity1 = "",
+    let entity1 = "",
       entity2 = "",
       entity3 = "",
       sector = "",
@@ -197,30 +191,33 @@ module.exports.getBotResponse = function (req, res) {
       spanOfControl = "",
       date = "";
 
-    if (typeof paramteresJson.Org_structure_KPI !== 'undefined') entity1 = paramteresJson.Org_structure_KPI;
-    if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
-    if (typeof paramteresJson.Org_structure_KPI1 !== 'undefined') entity2 = paramteresJson.Org_structure_KPI1;
-    if (typeof paramteresJson.Commonly_used_terms !== 'undefined') entity3 = paramteresJson.Commonly_used_terms;
-    if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
-    if (typeof paramteresJson.Business_Unit !== 'undefined') businessUnit = paramteresJson.Business_Unit;
-    if (typeof paramteresJson.Department !== 'undefined') department = paramteresJson.Department;
-    if (typeof paramteresJson.Gender !== 'undefined') gender = paramteresJson.Gender;
-    if (typeof paramteresJson.Group_by !== 'undefined') groupBy = paramteresJson.Group_by;
-    if (typeof paramteresJson.Division !== 'undefined') division = paramteresJson.Division;
-    if (typeof paramteresJson.employee_grade !== 'undefined') grade = paramteresJson.employee_grade;
-    if (typeof paramteresJson.Subdivision !== 'undefined') subDivision = paramteresJson.Subdivision;
-    if (typeof paramteresJson.date !== 'undefined' && paramteresJson.date !== '') {
+    if (typeof paramteresJson !== 'undefined') {
+      if (typeof paramteresJson.Org_structure_KPI !== 'undefined') entity1 = paramteresJson.Org_structure_KPI;
+      if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
+      if (typeof paramteresJson.Org_structure_KPI1 !== 'undefined') entity2 = paramteresJson.Org_structure_KPI1;
+      if (typeof paramteresJson.Commonly_used_terms !== 'undefined') entity3 = paramteresJson.Commonly_used_terms;
+      if (typeof paramteresJson.Sector !== 'undefined') sector = paramteresJson.Sector;
+      if (typeof paramteresJson.business_unit !== 'undefined') businessUnit = paramteresJson.business_unit;
+      if (typeof paramteresJson.Department !== 'undefined') department = paramteresJson.Department;
+      if (typeof paramteresJson.Gender !== 'undefined') gender = paramteresJson.Gender;
+      if (typeof paramteresJson.Group_by !== 'undefined') groupBy = paramteresJson.Group_by;
+      if (typeof paramteresJson.Division !== 'undefined') division = paramteresJson.Division;
+      if (typeof paramteresJson.employee_grade !== 'undefined') grade = paramteresJson.employee_grade;
+      if (typeof paramteresJson.Subdivision !== 'undefined') subDivision = paramteresJson.Subdivision;
+      if (typeof paramteresJson.date !== 'undefined' && paramteresJson.date !== '') {
 
-      date = paramteresJson.date;
-    }
-
-    else {
-
-      if (typeof paramteresJson["date-period"] !== "undefined") {
-        date = paramteresJson["date-period"];
+        date = paramteresJson.date;
       }
 
+      else {
+
+        if (typeof paramteresJson["date-period"] !== "undefined") {
+          date = paramteresJson["date-period"];
+        }
+
+      }
     }
+
 
     var json = {
       "question": text,
@@ -250,38 +247,86 @@ module.exports.getBotResponse = function (req, res) {
       "spanOfControl": spanOfControl
     };
 
-    var aiText = response.result.fulfillment.speech;
+    // console.log("DL model request body is " +JSON.stringify(json, null, 4));
 
-    if (!aiText.includes("****")) {
+    let employeeId = userId;
 
-      return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText }));
+    var query = 'SELECT * FROM employee WHERE Employee_Id = ' + mysql.escape(employeeId);
+
+    if (sector !== "") {
+      query = query + `AND SA_Sector like '%${sector}%' `;
+
     }
 
-    else {
-    
-      requestModule.post("http://13.232.168.178:8000/customapi", { json: json },
+    if (businessUnit !== "") {
+      query = query + `AND SA_BU like '%${businessUnit}%' `;
+    }
 
-        function (error, responseDlModel, body) {
-         
-         if (!error && responseDlModel.statusCode == 200) {
+    if (division !== "") {
+      query = query + `AND SA_Division like '%${division}%' `;
+    }
 
-            var concatedAiText = "";
-            if (body.Text && body.Text == 1) {
-           
-              concatedAiText = aiText.replace("****", body.TextContent);
-              return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": concatedAiText }));
-            }
-            else {
-              return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText, "responseBody": body }));
-            }
+    // console.log(query);
+
+    // create Request object
+    var request = new sql.Request();
+
+    request.query(query, function (err, recordset) {
+
+      if (err) {
+        console.log("Error while querying database :- ");
+        return res.status(500).send(JSON.stringify({ "statusCode": 500, "error": err, "response": null }));
+      }
+
+      else {
+
+        if (recordset.recordset.length > 0) {
+
+          var aiText = response.result.fulfillment.speech;
+
+          if (!aiText.includes("****")) {
+            insertRecord(employeeId,text,aiText);
+            return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText }));
           }
+
           else {
-            return res.status(500).send(JSON.stringify({ "statusCode": 500, "error": error, "response": null }))
+
+            requestModule.post("http://13.232.168.178:8000/customapi", { json: json },
+
+              function (error, responseDlModel, body) {
+
+                if (!error && responseDlModel.statusCode == 200) {
+
+                  var concatedAiText = "";
+                  if (body.Text && body.Text == 1) {
+
+                    concatedAiText = aiText.replace("****", body.TextContent);
+                    insertRecord(employeeId,text,concatedAiText);
+                    return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": concatedAiText }));
+                  }
+                  else {
+                    return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText, "responseBody": body }));
+                  }
+                }
+                else {
+                  return res.status(500).send(JSON.stringify({ "statusCode": 500, "error": error, "response": null }))
+                }
+
+              });
+
           }
+        }
 
-        });
+        else {
+          aiText = `According to the authentication list, you are not supposed to view the data for this particular dimension. 
+                    Please try asking information on the other dimensions of Mahindra.`;
+          return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText }));
+        }
 
-    }
+      }
+
+    });
+
   });
 
   apiaiReq.on('error', (error) => {
@@ -291,6 +336,25 @@ module.exports.getBotResponse = function (req, res) {
   apiaiReq.end();
 
 };
+
+var insertRecord = function (employeeId, userText, aiText) {
+
+  var request = new sql.Request();
+  request.input('HD_MASK_ID', sql.VarChar, employeeId);
+  request.input('text', sql.VarChar, userText);
+  request.input('aiText', sql.VarChar, aiText);
+  var chatHistorySql = "INSERT INTO chat_history (employee_id, user_query,bot_response) VALUES (@HD_MASK_ID,@text,@aiText)";
+  request.query(chatHistorySql, function (err, result) {
+    if (err) throw err;
+
+    else {
+      console.log("chat history record inserted");
+      return true;
+    }
+
+  });
+
+}
 
 
 
