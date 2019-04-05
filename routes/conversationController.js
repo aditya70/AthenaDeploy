@@ -320,6 +320,9 @@ module.exports.getBotResponse = function (req, res) {
         else {
           aiText = `According to the authentication list, you are not supposed to view the data for this particular dimension. 
                     Please try asking information on the other dimensions of Mahindra.`;
+
+                    insertRecord(employeeId,text,aiText);
+                    
           return res.status(200).send(JSON.stringify({ "statusCode": 200, "error": null, "response": aiText }));
         }
 
@@ -348,7 +351,7 @@ var insertRecord = function (employeeId, userText, aiText) {
     if (err) throw err;
 
     else {
-      console.log("chat history record inserted");
+     // console.log("chat history record inserted");
       return true;
     }
 
