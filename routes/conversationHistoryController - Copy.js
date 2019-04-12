@@ -53,7 +53,7 @@ const startDate = chatHistory.startDate;
 const endDate = chatHistory.endDate; 
 
 var request = new sql.Request();
-var stringRequest = `select * from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' `;
+var stringRequest = `select * from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' order by created_date desc`;
 console.log(stringRequest);
 request.query(stringRequest, function(err, recordset) {
     if(err) console.log(err);

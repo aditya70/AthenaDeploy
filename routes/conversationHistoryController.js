@@ -27,7 +27,7 @@ module.exports.getConversationHistory = function (req, res) {
     console.log('get conversation history controller');
 
     var request = new sql.Request();
-    var stringRequest = `select * from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' `;
+    var stringRequest = `select * from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' order by created_date desc`;
     console.log(stringRequest);
     request.query(stringRequest, function (err, recordset) {
         if (err) console.log(err);
@@ -77,8 +77,8 @@ module.exports.postConversationHistory = function (req, res) {
 
          totalRecords = recordset.recordset[0][""];
 
-        var stringRequest = `select user_query,bot_response,created_date from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' ORDER BY id
-          OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY`;
+        var stringRequest = `select user_query,bot_response,created_date from chat_history where  employee_id = '${userId}' and created_date between '${startDate}' and '${endDate}' order by created_date desc
+          OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY `;
        // console.log(stringRequest);
 
         request.query(stringRequest, function (err, recordset) {

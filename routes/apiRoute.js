@@ -59,7 +59,7 @@ router.use(bodyParser.json());
 
 router.get('/', (req, res) => {
 
-    console.log('api route ');
+   // console.log('api route ');
     res.send('welcome to api route');
 
 })
@@ -80,7 +80,7 @@ router.route('/conversation')
     .get(conversationController.getBotResponse);
 
 router.route('/sendemail')
-    .get(sendChatToEmailController.sendConversationHistoryToEmail);
+   .post(sendChatToEmailController.sendConversationHistoryToEmail);
 
 router.route('/uploadFile')
     .post(upload.single('file'), uploadFileController.uploadFile);
